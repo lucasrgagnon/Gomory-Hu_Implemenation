@@ -6,29 +6,25 @@ from gomory_hu import real_gh_node_size
 from stm_ford_fulkerson_max_flow import *
 
 G = nx.Graph()
-G.add_nodes_from([1, 2, 3, 4, 5, 6])
-G.add_edges_from([(1, 2, {'weight' : 100}), (1, 3, {'weight' : 1}),(2, 3, {'weight' : 2}), (2, 4, {'weight' : 100}), (2, 5, {'weight' : 1}), \
-                  (3, 4, {'weight' : 3}), (4, 5, {'weight' : 1}), (4, 6, {'weight' : 1}), (5, 6, {'weight' : 10})])
+G.add_nodes_from(['a', 'b', 'c', 'd', 'e', 'f'])
+G.add_edges_from([('a', 'b', {'weight' : 10}), ('a', 'f', {'weight' : 8}),('b', 'c', {'weight' : 4}), \
+                  ('b', 'e', {'weight' : 2}), ('b', 'f', {'weight' : 3}), ('c', 'd', {'weight' : 5}), \
+                  ('c', 'e', {'weight' : 4}), ('c', 'f', {'weight' : 2}), ('d', 'e', {'weight' : 7}), \
+                  ('d', 'f', {'weight' : 2}), ('e', 'f', {'weight' : 3})])
 
 
 
 T = gomory_hu_tree(G)
-print(type(T))
+
+print("NODES:")
+
 for node in T.nodes_iter():
-    if type(node) == nx.classes.graph.Graph:
-        print("Graph")
-    else:
-        print(node)
-    print(T.node[node])
-    if 'graph' in T.node[node]:
-        print(T.node[node]['graph'].nodes())
-        print(real_gh_node_size(T.node[node]['graph']))
+    print(node)
+    print(T.node[node]['graph'].nodes())
 
 print()
 print("EDGES:")
-print()
 
-for edge in T.edges_iter():
+for edge in T.edges_iter(data=True):
     print(edge)
-    print(T.get_edge_data(T, edge))
 

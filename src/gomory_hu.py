@@ -8,7 +8,7 @@ import random
 import sys
 
 # assumes connected
-def gomory_hu_tree(Graph):
+def gomory_hu_tree(Graph, min_cut_alg = stm_min_cut):
     gh_tree = nx.Graph()
     tree_labels = label_generator(0)
     parent_label = next(tree_labels)
@@ -17,7 +17,7 @@ def gomory_hu_tree(Graph):
     complete = False
     while not complete:
         v1, v2 = select_random_nodes(G)
-        (S1, S2, cut) = stm_min_cut(G, v1, v2)
+        (S1, S2, cut) = min_cut_alg(G, v1, v2)
         G1 = G.copy()
         G2 = G.copy()
         g1_label = next(tree_labels)
@@ -52,6 +52,7 @@ def gomory_hu_tree(Graph):
 
 def condense_nodes(G, H, S, v):
     H.add_node(v)
+    cut_weight = 0
     for vertex in G.nodes_iter():
         if vertex in S:
             for neighbor in H.neighbors(vertex):
