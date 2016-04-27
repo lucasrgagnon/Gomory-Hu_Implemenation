@@ -4,7 +4,7 @@ __all__ = ['stm_min_cut', 'breadth_first_search_path', 'breadth_first_search_ver
 from collections import deque
 import sys
 
-def stm_min_cut(G, u, v):
+def sdg_min_cut(G, u, v):
     D = G.to_directed()
     max_flow = 0
     path_queue, flow = breadth_first_search_path(D, u, v)

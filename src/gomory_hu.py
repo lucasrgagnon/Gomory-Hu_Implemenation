@@ -3,12 +3,12 @@ __all__ = ['gomory_hu_tree', 'condense_nodes']
 
 import networkx as nx
 from collections import deque
-from stm_ford_fulkerson_max_flow import *
+from sdg_ford_fulkerson_max_flow import *
 import random
 import sys
 
 # assumes connected
-def gomory_hu_tree(Graph, min_cut_alg = stm_min_cut):
+def s(Graph, min_cut_alg = sdg_min_cut):
     gh_tree = nx.Graph()
     tree_labels = label_generator(0)
     parent_label = next(tree_labels)
