@@ -1,8 +1,11 @@
 __author__ = 'lucasgagnon'
 
 import networkx as nx
+import csv
+import sys
 from gomory_hu import *
-from sdg_ford_fulkerson_max_flow import *
+
+GRAPH_DATA = ""
 
 G = nx.Graph()
 G.add_nodes_from(['a', 'b', 'c', 'd', 'e', 'f'])

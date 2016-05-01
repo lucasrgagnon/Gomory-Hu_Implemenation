@@ -1,6 +1,7 @@
 __author__ = 'lucasgagnon'
 __all__ = ['stm_min_cut', 'breadth_first_search_path', 'breadth_first_search_vertices']
 
+import networkx as nx
 from collections import deque
 import sys
 
@@ -8,7 +9,7 @@ def sdg_min_cut(G, u, v):
     D = G.to_directed()
     max_flow = 0
     path_queue, flow = breadth_first_search_path(D, u, v)
-    while flow != 0:
+    while flow != -1:
         max_flow += flow
         predecessor = path_queue.popleft()
         while len(path_queue) != 0:
@@ -21,7 +22,7 @@ def sdg_min_cut(G, u, v):
                 D[successor][predecessor]['weight'] += flow
             predecessor = successor
         path_queue, flow = breadth_first_search_path(D, u, v)
-    S1 = breadth_first_search_vertices(D, u)
+    S1 = nx.node_connected_component(D.to_undirected(), u)
     S2 = {v for v in G.nodes_iter() if v not in S1}
     return S1, S2, max_flow
 
@@ -41,7 +42,7 @@ def breadth_first_search_path(D, u, v):
                 found = True
                 break
     if not found:
-        return deque(), 0
+        return deque(), -1
     else:
         child = v
         path_queue = deque([child])

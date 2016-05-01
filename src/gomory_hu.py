@@ -2,15 +2,23 @@ __author__ = 'lucasgagnon'
 __all__ = ['gomory_hu_tree', 'condense_nodes']
 
 import networkx as nx
-from collections import deque
-from sdg_ford_fulkerson_max_flow import *
-import random
 import sys
+import random
+import sdg_ford_fulkerson_max_flow
 
-# assumes connected
-def s(Graph, min_cut_alg = sdg_min_cut):
+
+
+def gomory_hu_tree(Graph, min_cut_alg = sdg_ford_fulkerson_max_flow.sdg_min_cut):
     gh_tree = nx.Graph()
     tree_labels = label_generator(0)
+    if not (nx.is_connected(Graph)):
+        comps = nx.connected_components(Graph)
+        oldcomp = next(comps)
+        for comp in comps:
+            v1 = oldcomp[0]
+            v2 = comp[0]
+            Graph.add_edge(v1, v2, weight = 0)
+            oldcomp = comp
     parent_label = next(tree_labels)
     G = Graph
     gh_tree.add_node(parent_label, graph=G)
@@ -51,6 +59,13 @@ def s(Graph, min_cut_alg = sdg_min_cut):
 
 
 def condense_nodes(G, H, S, v):
+    """
+    :param G:
+    :param H:
+    :param S:
+    :param v:
+    :return:
+    """
     H.add_node(v)
     cut_weight = 0
     for vertex in G.nodes_iter():
