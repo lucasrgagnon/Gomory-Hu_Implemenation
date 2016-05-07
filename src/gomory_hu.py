@@ -1,5 +1,5 @@
 __author__ = 'lucasgagnon'
-__all__ = ['gomory_hu_tree', 'condense_nodes']
+__all__ = ['min_k_cut', 'gomory_hu_tree', 'condense_nodes','select_random_nodes', 'label_generator', 'real_gh_node_size']
 
 import networkx as nx
 import random

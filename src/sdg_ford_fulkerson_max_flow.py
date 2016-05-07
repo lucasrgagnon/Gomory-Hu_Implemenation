@@ -1,11 +1,20 @@
 __author__ = 'lucasgagnon'
-__all__ = ['stm_min_cut', 'breadth_first_search_path', 'breadth_first_search_vertices']
+__all__ = ['stm_min_cut', 'breadth_first_search_path']
 
 import networkx as nx
 from collections import deque
 import sys
 
 def sdg_min_cut(G, u, v):
+    """
+    Computes minimum u, v cut using Ford-Fulkerson Algorithm, from
+    "Computing the minimum cut and maximum flow of undirected graphs" by
+    Schroeder, Jonatan and Guedes, ALP and Duarte Jr, Elias P.
+    :param G: graph
+    :param u: source vertex
+    :param v: sink vertex
+    :return: partition of vertices of G, S1 and S2, as well as the corresponding max flow.
+    """
     D = G.to_directed()
     max_flow = 0
     path_queue, flow = breadth_first_search_path(D, u, v)
@@ -29,6 +38,13 @@ def sdg_min_cut(G, u, v):
 
 
 def breadth_first_search_path(D, u, v):
+    """
+    implementation of BFS for above max flow algorihtm
+    :param D: digraph
+    :param u: source
+    :param v: searched-for vertex
+    :return: path from u to v, in queue form, as well as the minimum weight of that path
+    """
     queue = deque([u])
     tree = {}
     found = False
@@ -56,14 +72,3 @@ def breadth_first_search_path(D, u, v):
                 min_weight = D[parent][child]['weight']
             path_queue.append(parent)
         return path_queue, min_weight
-
-def breadth_first_search_vertices(D, u):
-    queue = deque([u])
-    vertices = {u}
-    while len(queue) != 0:
-        current = queue.popleft()
-        for vertex in D.neighbors(current):
-            if vertex not in vertices:
-                vertices.add(vertex)
-                queue.append(vertex)
-    return(vertices)
