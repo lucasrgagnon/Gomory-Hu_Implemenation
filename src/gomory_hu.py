@@ -2,23 +2,53 @@ __author__ = 'lucasgagnon'
 __all__ = ['gomory_hu_tree', 'condense_nodes']
 
 import networkx as nx
-import sys
 import random
 import sdg_ford_fulkerson_max_flow
 
-
+def min_k_cut(G, k):
+    """
+    Finds an approximate minimum k-cut on a graph G using the Gomory-Hu algorithm
+    :param G: graph
+    :param k: desired number of components
+    :return: set partition of vertices in G, int cut weight
+    """
+    if k > len(G):
+        return None
+    gh = gomory_hu_tree(G)
+    edge_list = list(gh.edges_iter(data='weight'))
+    sorted_edges = sorted(edge_list, key = lambda x: x[2], reverse=True)
+    cut = 0
+    for i in range(0, k):
+        edge = sorted(i)
+        cut += edge[2]
+        gh.remove_edge(edge[0], edge[1])
+    partition = set
+    for component in gh.connected_components:
+        part = set()
+        for vertex in component:
+            for subvertex in gh.node[vertex]['graph'].nodes_iter():
+                part.add(subvertex)
+        partition.add(part)
+    return(partition, cut)
 
 def gomory_hu_tree(Graph, min_cut_alg = sdg_ford_fulkerson_max_flow.sdg_min_cut):
+    """
+    Computes the Gomory-Hu minimum cut tree for a graph G, using a min flow/max cut
+    algorithm which defaults to sdg_ford_fulkerson_max_flow.
+    :param Graph: Graph
+    :param min_cut_alg: Algorithm
+    :return: Networkx Graph,
+    """
     gh_tree = nx.Graph()
     tree_labels = label_generator(0)
     if not (nx.is_connected(Graph)):
         comps = nx.connected_components(Graph)
         oldcomp = next(comps)
+        v1 = oldcomp.pop()
         for comp in comps:
-            v1 = oldcomp[0]
-            v2 = comp[0]
+            v2 = comp.pop()
             Graph.add_edge(v1, v2, weight = 0)
-            oldcomp = comp
+            v1 = v2
     parent_label = next(tree_labels)
     G = Graph
     gh_tree.add_node(parent_label, graph=G)
@@ -60,11 +90,11 @@ def gomory_hu_tree(Graph, min_cut_alg = sdg_ford_fulkerson_max_flow.sdg_min_cut)
 
 def condense_nodes(G, H, S, v):
     """
-    :param G:
-    :param H:
-    :param S:
-    :param v:
-    :return:
+    Condenses vertices into a single vertex, as is required by the Gomory-Hu algorithm
+    :param G: Read-Only graph
+    :param H: Copy of G which will have nodes condensed
+    :param S: Set of vertices NOT to condense
+    :param v: label of vertex to condense others into
     """
     H.add_node(v)
     cut_weight = 0
@@ -77,11 +107,17 @@ def condense_nodes(G, H, S, v):
                     else:
                         H[v][neighbor]['weight'] += H[vertex][neighbor]['weight']
             H.remove_node(vertex)
-    return
 
 
 def select_random_nodes(G):
+    """
+    Selects random nodes of a graph
+    :param G: Graph
+    :return: two distinct vertices of G, chosen at random
+    """
     v1, v2 = 0, 0
+    if len(G) <= 1:
+        return None
     while v1 == v2 or (type(v1) == str and v1[0] == "_") or (type(v2) ==  str and v2[0] == "_"):
         v1 = random.choice(G.nodes())
         v2 = random.choice(G.nodes())
@@ -89,6 +125,13 @@ def select_random_nodes(G):
 
 
 def label_generator(start):
+    """
+    Returns a generatos for labels of vertices in the Gomory-Hu tree.
+    Labels begin with underscore "_" to signify their operational, but
+    not descriptive function (users should not interact with them).
+    :param start:
+    :return: label, beginning with _ and followed by increasing integers
+    """
     label = start
     while True:
         yield "_" + str(label)
@@ -96,6 +139,14 @@ def label_generator(start):
 
 
 def real_gh_node_size(G):
+    """
+    Returns the number of non-placeholder vertices in a graph G.
+    Placeholder vertices are vertices created in the condensation process,
+    and signify connections of a graph/vertex of a Gomory-Hu tree to other
+    raph/vertex.
+    :param G: Graph
+    :return: int number of non-placeholder vertices in G
+    """
     count = 0
     for node in G.nodes_iter():
         if type(node) == str:
